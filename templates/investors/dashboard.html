@@ -1,0 +1,301 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}Dashboard - Investor Platform{% endblock %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <!-- Welcome Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="alert alert-primary d-flex align-items-center" role="alert">
+                <i class="bi bi-info-circle me-2 fs-5"></i>
+                <div>
+                    <strong>Welcome back, {{ user.get_full_name|default:user.username }}!</strong>
+                    {% if is_admin_or_partner %}
+                        You have full access to all investors and deals.
+                    {% else %}
+                        You are viewing data for your assigned investors only.
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row g-4 mb-4">
+        <!-- Total Investors -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase mb-2">Total Investors</h6>
+                            <h2 class="mb-0">{{ total_investors }}</h2>
+                            {% if is_admin_or_partner %}
+                            <small class="text-muted">
+                                <span class="badge bg-primary">Group A: {{ group_a_count }}</span>
+                                <span class="badge bg-secondary ms-1">Group B: {{ group_b_count }}</span>
+                            </small>
+                            {% else %}
+                            <small class="text-muted">Assigned to you</small>
+                            {% endif %}
+                        </div>
+                        <div class="stat-icon bg-primary text-white">
+                            <i class="bi bi-people"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Deals -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase mb-2">Total Deals</h6>
+                            <h2 class="mb-0">{{ total_deals }}</h2>
+                            <small class="text-muted">
+                                <span class="badge bg-info">New: {{ new_deals }}</span>
+                                <span class="badge bg-success ms-1">Active: {{ active_deals }}</span>
+                            </small>
+                        </div>
+                        <div class="stat-icon bg-success text-white">
+                            <i class="bi bi-briefcase"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Commitments -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase mb-2">Commitments</h6>
+                            <h2 class="mb-0">{{ total_commitments }}</h2>
+                            <small class="text-muted">Total count</small>
+                        </div>
+                        <div class="stat-icon bg-info text-white">
+                            <i class="bi bi-cash-stack"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total Amount -->
+        <div class="col-lg-3 col-md-6">
+            <div class="card stat-card h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="text-muted text-uppercase mb-2">Total Amount</h6>
+                            <h2 class="mb-0">₹{{ total_commitment_amount|floatformat:0 }}</h2>
+                            <small class="text-muted">Committed</small>
+                        </div>
+                        <div class="stat-icon bg-warning text-white">
+                            <i class="bi bi-currency-rupee"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deal Status Breakdown (Admin/Partner only) -->
+    {% if is_admin_or_partner %}
+    <div class="row g-4 mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0"><i class="bi bi-pie-chart"></i> Deal Status Breakdown</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-info mb-1">{{ new_deals }}</h3>
+                                <p class="text-muted mb-0">New Deals</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-success mb-1">{{ active_deals }}</h3>
+                                <p class="text-muted mb-0">Active Deals</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-warning mb-1">{{ closing_deals }}</h3>
+                                <p class="text-muted mb-0">Closing Deals</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-secondary mb-1">{{ closed_deals }}</h3>
+                                <p class="text-muted mb-0">Closed Deals</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Recent Data Tables -->
+    <div class="row g-4">
+        <!-- Recent Investors -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-people"></i> Recent Investors</h5>
+                    <a href="{% url 'investors:investor_list' %}" class="btn btn-sm btn-outline-primary">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_investors %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Group</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for investor in recent_investors %}
+                                    <tr>
+                                        <td>{{ investor.full_name }}</td>
+                                        <td><small>{{ investor.email }}</small></td>
+                                        <td>
+                                            <span class="badge bg-{{ investor.group|lower|yesno:'primary,secondary' }}">
+                                                {{ investor.get_group_display }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'investors:investor_detail' investor.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No investors found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Deals -->
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-briefcase"></i> Recent Deals</h5>
+                    <a href="{% url 'investors:deal_list' %}" class="btn btn-sm btn-outline-primary">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_deals %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Deal Size</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for deal in recent_deals %}
+                                    <tr>
+                                        <td>{{ deal.company_name }}</td>
+                                        <td><strong>₹{{ deal.deal_size|floatformat:0 }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-info">{{ deal.get_status_display }}</span>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'investors:deal_detail' deal.pk %}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No deals found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Commitments -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0"><i class="bi bi-cash-stack"></i> Recent Commitments</h5>
+                    <a href="{% url 'investors:commitment_list' %}" class="btn btn-sm btn-outline-primary">
+                        View All <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if recent_commitments %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Investor</th>
+                                        <th>Deal</th>
+                                        <th>Amount</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for commitment in recent_commitments %}
+                                    <tr>
+                                        <td>{{ commitment.investor.full_name }}</td>
+                                        <td>{{ commitment.deal.company_name }}</td>
+                                        <td><strong>₹{{ commitment.amount|floatformat:2 }}</strong></td>
+                                        <td>
+                                            <span class="badge bg-{% if commitment.status == 'paid' %}success{% elif commitment.status == 'committed' %}warning{% else %}info{% endif %}">
+                                                {{ commitment.get_status_display }}
+                                            </span>
+                                        </td>
+                                        <td><small>{{ commitment.created_at|date:"M d, Y" }}</small></td>
+                                        <td>
+                                            <a href="{% url 'investors:commitment_list' %}?investor={{ commitment.investor.pk }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No commitments found.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Investor Platform - Beeline Capital Advisors{% endblock %}</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --sidebar-collapsed-width: 70px;
+            --topbar-height: 60px;
+            --primary-color: #0d6efd;
+            --sidebar-bg: #212529;
+            --sidebar-hover: #343a40;
+            --sidebar-active: #0d6efd;
+        }
+
+        body {
+            font-size: 0.875rem;
+            background-color: #f8f9fa; /* Light grey bg for better contrast */
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Styles */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            background-color: var(--sidebar-bg);
+            color: #fff;
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            width: var(--sidebar-collapsed-width);
+        }
+
+        .sidebar-header {
+            height: var(--topbar-height);
+            display: flex;
+            align-items: center;
+            padding: 0 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-brand {
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed .sidebar-brand span {
+            display: none;
+        }
+
+        .sidebar-nav {
+            padding: 1rem 0;
+        }
+
+        .nav-item {
+            margin: 0.25rem 0;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: var(--sidebar-hover);
+            color: #fff;
+            border-left-color: var(--sidebar-active);
+        }
+
+        .nav-link.active {
+            background-color: var(--sidebar-active);
+            color: #fff;
+            border-left-color: #fff;
+        }
+
+        .nav-link i {
+            width: 20px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+        }
+
+        .sidebar.collapsed .nav-link span {
+            display: none;
+        }
+
+        .sidebar.collapsed .nav-link {
+            justify-content: center;
+            padding: 0.75rem;
+        }
+
+        .sidebar.collapsed .nav-link i {
+            margin-right: 0;
+        }
+
+        /* Top Navbar Styles */
+        .topbar {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: var(--sidebar-width); /* Starts after sidebar */
+            height: var(--topbar-height);
+            background-color: #fff;
+            border-bottom: 1px solid #dee2e6;
+            z-index: 999;
+            transition: left 0.3s; /* Smooth transition for left position */
+            display: flex;
+            align-items: center;
+            padding: 0 1.5rem;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        /* Logic: When sidebar is collapsed, topbar moves left */
+        .sidebar.collapsed ~ .topbar {
+            left: var(--sidebar-collapsed-width);
+        }
+
+        .topbar-toggle {
+            background: none;
+            border: none;
+            font-size: 1.25rem;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0.5rem;
+            margin-right: 1rem;
+        }
+
+        .topbar-toggle:hover {
+            color: var(--primary-color);
+        }
+
+        .topbar-content {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .topbar-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #212529;
+            margin: 0;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding-top: calc(var(--topbar-height) + 1.5rem); /* Topbar height + spacing */
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-bottom: 1.5rem;
+            transition: margin-left 0.3s;
+            min-height: 100vh;
+        }
+
+        /* Logic: When sidebar is collapsed, content expands */
+        .sidebar.collapsed ~ .main-content {
+            margin-left: var(--sidebar-collapsed-width);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                margin-left: calc(-1 * var(--sidebar-width));
+            }
+
+            .sidebar.show {
+                margin-left: 0;
+            }
+
+            .topbar {
+                left: 0;
+            }
+            
+            .sidebar.collapsed ~ .topbar {
+                left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar.collapsed ~ .main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if user.is_authenticated %}
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="{% url 'investors:dashboard' %}" class="sidebar-brand">
+                <i class="bi bi-graph-up-arrow"></i>
+                <span class="ms-2">Beeline Capital</span>
+            </a>
+        </div>
+        <div class="sidebar-nav">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'investors:dashboard' %}">
+                        <i class="bi bi-speedometer2"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'investor' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'investors:investor_list' %}">
+                        <i class="bi bi-people"></i>
+                        <span>Investors</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'deal' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'investors:deal_list' %}">
+                        <i class="bi bi-briefcase"></i>
+                        <span>Deals</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link {% if 'commitment' in request.resolver_match.url_name %}active{% endif %}" href="{% url 'investors:commitment_list' %}">
+                        <i class="bi bi-cash-stack"></i>
+                        <span>Commitments</span>
+                    </a>
+                </li>
+                {% if user.is_admin %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'admin:index' %}" target="_blank">
+                        <i class="bi bi-gear"></i>
+                        <span>Admin Panel</span>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+
+    <div class="topbar">
+        <button class="topbar-toggle" id="sidebarToggle" type="button">
+            <i class="bi bi-list"></i>
+        </button>
+        <div class="topbar-content">
+            <h1 class="topbar-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="topbar-user">
+                <div class="dropdown">
+                    <button class="btn btn-link text-decoration-none text-dark dropdown-toggle" type="button" id="userDropdown" data-bs-toggle="dropdown">
+                        <i class="bi bi-person-circle fs-4"></i>
+                        <span class="ms-2">{{ user.get_full_name|default:user.username }}</span>
+                        <span class="badge bg-primary ms-2">{{ user.get_role_display }}</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li>
+                            <form action="{% url 'investors:logout' %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-box-arrow-right"></i> Logout
+                                </button>
+                            </form>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="main-content">
+        {% if messages %}
+        <div class="mb-4">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Sidebar toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            
+            // Check for saved sidebar state
+            const sidebarState = localStorage.getItem('sidebarCollapsed');
+            if (sidebarState === 'true') {
+                sidebar.classList.add('collapsed');
+            }
+            
+            if(sidebarToggle){
+                sidebarToggle.addEventListener('click', function() {
+                    sidebar.classList.toggle('collapsed');
+                    localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+                });
+            }
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

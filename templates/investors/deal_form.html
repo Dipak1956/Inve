@@ -1,0 +1,123 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}{% if object %}Edit{% else %}Add{% endif %} Deal - Investor Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="bi bi-briefcase"></i> {% if object %}Edit{% else %}Add New{% endif %} Deal</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-12">
+                                <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }} <span class="text-danger">*</span></label>
+                                {{ form.company_name }}
+                                {% if form.company_name.errors %}
+                                    <div class="text-danger small">{{ form.company_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-12">
+                                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }} <span class="text-danger">*</span></label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <div class="text-danger small">{{ form.description.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.deal_size.id_for_label }}" class="form-label">{{ form.deal_size.label }} <span class="text-danger">*</span></label>
+                                {{ form.deal_size }}
+                                {% if form.deal_size.errors %}
+                                    <div class="text-danger small">{{ form.deal_size.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.ticket_size.id_for_label }}" class="form-label">{{ form.ticket_size.label }} <span class="text-danger">*</span></label>
+                                {{ form.ticket_size }}
+                                {% if form.ticket_size.errors %}
+                                    <div class="text-danger small">{{ form.ticket_size.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.round_no.id_for_label }}" class="form-label">{{ form.round_no.label }} <span class="text-danger">*</span></label>
+                                {{ form.round_no }}
+                                {% if form.round_no.errors %}
+                                    <div class="text-danger small">{{ form.round_no.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} <span class="text-danger">*</span></label>
+                                {{ form.status }}
+                                {% if form.status.errors %}
+                                    <div class="text-danger small">{{ form.status.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.workflow_status.id_for_label }}" class="form-label">{{ form.workflow_status.label }} <span class="text-danger">*</span></label>
+                                {{ form.workflow_status }}
+                                {% if form.workflow_status.errors %}
+                                    <div class="text-danger small">{{ form.workflow_status.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Document Uploads Section -->
+                        <hr class="my-4">
+                        <h5 class="mb-3"><i class="bi bi-file-earmark-arrow-up"></i> Document Uploads</h5>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.pitch_deck.id_for_label }}" class="form-label">{{ form.pitch_deck.label }}</label>
+                                {{ form.pitch_deck }}
+                                <small class="form-text text-muted">{{ form.pitch_deck.help_text }}</small>
+                                {% if form.pitch_deck.errors %}
+                                    <div class="text-danger small">{{ form.pitch_deck.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.financials.id_for_label }}" class="form-label">{{ form.financials.label }}</label>
+                                {{ form.financials }}
+                                <small class="form-text text-muted">{{ form.financials.help_text }}</small>
+                                {% if form.financials.errors %}
+                                    <div class="text-danger small">{{ form.financials.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> Save
+                            </button>
+                            <a href="{% url 'investors:deal_list' %}" class="btn btn-secondary">
+                                <i class="bi bi-x-circle"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Add Bootstrap classes to form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const inputs = document.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            if (!input.classList.contains('form-control') && !input.classList.contains('form-select')) {
+                if (input.tagName === 'SELECT') {
+                    input.classList.add('form-select');
+                } else if (input.tagName === 'TEXTAREA') {
+                    input.classList.add('form-control');
+                } else {
+                    input.classList.add('form-control');
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
+

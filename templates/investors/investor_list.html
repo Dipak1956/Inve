@@ -1,0 +1,162 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}Investors - Investor Platform{% endblock %}
+
+{% block page_title %}Investors{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-people"></i> Investors</h2>
+        {% if user.is_partner or user.is_admin %}
+        <a href="{% url 'investors:investor_create' %}" class="btn btn-primary">
+            <i class="bi bi-plus-circle"></i> Add New Investor
+        </a>
+        {% endif %}
+    </div>
+    
+    <!-- Filters and Search -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3">
+                <div class="col-md-4">
+                    <label for="search" class="form-label">Search</label>
+                    <input type="text" name="search" id="search" class="form-control" 
+                           placeholder="Search by name, email, mobile, or PAN..." 
+                           value="{{ request.GET.search }}">
+                </div>
+                <div class="col-md-2">
+                    <label for="group" class="form-label">Group</label>
+                    <select name="group" id="group" class="form-select">
+                        <option value="">All Groups</option>
+                        <option value="A" {% if request.GET.group == 'A' %}selected{% endif %}>Group A (>1Cr)</option>
+                        <option value="B" {% if request.GET.group == 'B' %}selected{% endif %}>Group B (≤1Cr)</option>
+                    </select>
+                </div>
+                {% if not user.is_team_member %}
+                <div class="col-md-3">
+                    <label for="team_member" class="form-label">Assigned To</label>
+                    <select name="team_member" id="team_member" class="form-select">
+                        <option value="">All Team Members</option>
+                        {% for member in team_members %}
+                        <option value="{{ member.id }}" {% if request.GET.team_member == member.id|stringformat:"s" %}selected{% endif %}>
+                            {{ member.get_full_name|default:member.username }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endif %}
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">
+                        <i class="bi bi-search"></i> Filter
+                    </button>
+                    <a href="{% url 'investors:investor_list' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle"></i> Clear
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Investors Table -->
+    <div class="card">
+        <div class="card-header bg-white">
+            <h5 class="mb-0">Investor List</h5>
+        </div>
+        <div class="card-body">
+            {% if investors %}
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Group</th>
+                                <th>Assigned To</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for investor in investors %}
+                            <tr>
+                                <td>
+                                    <strong>{{ investor.full_name }}</strong>
+                                    <br>
+                                    <small class="text-muted">{{ investor.email }}</small>
+                                </td>
+                                <td>{{ investor.mobile }}</td>
+                                <td>
+                                    <span class="badge bg-{{ investor.group|lower|yesno:'primary,secondary' }}">
+                                        {{ investor.get_group_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if investor.assigned_team_member %}
+                                        {{ investor.assigned_team_member.get_full_name|default:investor.assigned_team_member.username }}
+                                    {% else %}
+                                        <span class="text-muted">Not Assigned</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a href="{% url 'investors:investor_detail' investor.pk %}" 
+                                           class="btn btn-outline-primary" title="View">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        {% if user.is_partner or user.is_admin or investor.assigned_team_member == user %}
+                                        <a href="{% url 'investors:investor_update' investor.pk %}" 
+                                           class="btn btn-outline-secondary" title="Edit">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Pagination -->
+                {% if is_paginated %}
+                <nav aria-label="Page navigation" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.team_member %}&team_member={{ request.GET.team_member }}{% endif %}">First</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.team_member %}&team_member={{ request.GET.team_member }}{% endif %}">Previous</a>
+                            </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.team_member %}&team_member={{ request.GET.team_member }}{% endif %}">Next</a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.group %}&group={{ request.GET.group }}{% endif %}{% if request.GET.team_member %}&team_member={{ request.GET.team_member }}{% endif %}">Last</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="bi bi-inbox fs-1 text-muted"></i>
+                    <p class="text-muted mt-3">No investors found.</p>
+                    {% if user.is_partner or user.is_admin %}
+                    <a href="{% url 'investors:investor_create' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Add New Investor
+                    </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

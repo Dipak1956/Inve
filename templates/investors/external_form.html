@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Your Information - Beeline Capital Advisors</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css">
+    
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-card {
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        }
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            padding: 2rem;
+        }
+        .section-title {
+            color: #667eea;
+            font-weight: 600;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+        .required-field::after {
+            content: " *";
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container">
+            <div class="card form-card">
+                <div class="form-header text-center">
+                    <i class="bi bi-shield-check fs-1 mb-3"></i>
+                    <h2 class="mb-2">Beeline Capital Advisors</h2>
+                    <p class="mb-0">Update Your Investor Information</p>
+                </div>
+                <div class="card-body p-4">
+                    <div class="alert alert-info" role="alert">
+                        <i class="bi bi-info-circle"></i> 
+                        <strong>Welcome, {{ investor.full_name }}!</strong> Please review and update your information below. All fields marked with <span class="text-danger">*</span> are required.
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <!-- Personal Details Section -->
+                        <h5 class="section-title">
+                            <i class="bi bi-person"></i> Personal Details
+                        </h5>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.full_name.id_for_label }}" class="form-label required-field">Full Name</label>
+                                {{ form.full_name }}
+                                {% if form.full_name.errors %}
+                                    <div class="text-danger small">{{ form.full_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label required-field">Email Address</label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.mobile.id_for_label }}" class="form-label required-field">Mobile Number</label>
+                                {{ form.mobile }}
+                                {% if form.mobile.errors %}
+                                    <div class="text-danger small">{{ form.mobile.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.dob.id_for_label }}" class="form-label required-field">Date of Birth</label>
+                                {{ form.dob }}
+                                {% if form.dob.errors %}
+                                    <div class="text-danger small">{{ form.dob.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-12">
+                                <label for="{{ form.address.id_for_label }}" class="form-label required-field">Address</label>
+                                {{ form.address }}
+                                {% if form.address.errors %}
+                                    <div class="text-danger small">{{ form.address.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- KYC Information Section -->
+                        <h5 class="section-title">
+                            <i class="bi bi-shield-check"></i> KYC Information
+                        </h5>
+                        
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.pan.id_for_label }}" class="form-label required-field">PAN Card Number</label>
+                                {{ form.pan }}
+                                <small class="form-text text-muted">10 characters (e.g., ABCDE1234F)</small>
+                                {% if form.pan.errors %}
+                                    <div class="text-danger small">{{ form.pan.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.aadhaar.id_for_label }}" class="form-label required-field">Aadhaar Number</label>
+                                {{ form.aadhaar }}
+                                <small class="form-text text-muted">12 digits</small>
+                                {% if form.aadhaar.errors %}
+                                    <div class="text-danger small">{{ form.aadhaar.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Document Upload Section -->
+                        <h5 class="section-title">
+                            <i class="bi bi-file-earmark-arrow-up"></i> Document Uploads
+                        </h5>
+                        
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-4">
+                                <label for="{{ form.pan_document.id_for_label }}" class="form-label">PAN Card Document</label>
+                                {{ form.pan_document }}
+                                <small class="form-text text-muted">{{ form.pan_document.help_text }}</small>
+                                {% if form.pan_document.errors %}
+                                    <div class="text-danger small">{{ form.pan_document.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.aadhaar_document.id_for_label }}" class="form-label">Aadhaar Card Document</label>
+                                {{ form.aadhaar_document }}
+                                <small class="form-text text-muted">{{ form.aadhaar_document.help_text }}</small>
+                                {% if form.aadhaar_document.errors %}
+                                    <div class="text-danger small">{{ form.aadhaar_document.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.bank_statement.id_for_label }}" class="form-label">Bank Statement</label>
+                                {{ form.bank_statement }}
+                                <small class="form-text text-muted">{{ form.bank_statement.help_text }}</small>
+                                {% if form.bank_statement.errors %}
+                                    <div class="text-danger small">{{ form.bank_statement.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Form Actions -->
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check-circle"></i> Submit & Update Information
+                            </button>
+                        </div>
+                        
+                        <div class="alert alert-warning mt-3" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> 
+                            <strong>Note:</strong> After submitting, this link will be deactivated for security reasons.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
