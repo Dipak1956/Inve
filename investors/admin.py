@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Investor, Deal, Commitment, Document, SecureLink
+from .models import User, Investor, Deal, Commitment, Document, SecureLink, MyModel
 
 
 @admin.register(User)
@@ -19,10 +19,11 @@ class UserAdmin(BaseUserAdmin):
 @admin.register(Investor)
 class InvestorAdmin(admin.ModelAdmin):
     """Investor Admin"""
-    list_display = ['full_name', 'email', 'mobile', 'group', 'assigned_team_member', 'created_at']
-    list_filter = ['group', 'assigned_team_member', 'created_at']
+    list_display = ['full_name', 'email', 'mobile', 'group', 'get_assigned_team_members', 'created_at']
+    list_filter = ['group', 'assigned_team_members', 'created_at']
     search_fields = ['full_name', 'email', 'mobile', 'pan']
     readonly_fields = ['created_at', 'updated_at', 'get_masked_aadhaar']
+    filter_horizontal = ['assigned_team_members']
     fieldsets = (
         ('Basic Information', {
             'fields': ('full_name', 'email', 'mobile', 'address', 'dob')
@@ -34,7 +35,7 @@ class InvestorAdmin(admin.ModelAdmin):
             'fields': ('investment_capacity', 'group')
         }),
         ('Relationships', {
-            'fields': ('assigned_team_member', 'family_head')
+            'fields': ('assigned_team_members', 'family_head')
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -45,7 +46,10 @@ class InvestorAdmin(admin.ModelAdmin):
     def get_masked_aadhaar(self, obj):
         return obj.get_masked_aadhaar()
     get_masked_aadhaar.short_description = 'Aadhaar (Masked)'
-
+    
+    def get_assigned_team_members(self, obj):
+        return ', '.join([user.username for user in obj.assigned_team_members.all()])
+    get_assigned_team_members.short_description = 'Assigned Team Members'
 
 @admin.register(Deal)
 class DealAdmin(admin.ModelAdmin):
@@ -75,7 +79,6 @@ class DealAdmin(admin.ModelAdmin):
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
 
-
 @admin.register(Commitment)
 class CommitmentAdmin(admin.ModelAdmin):
     """Commitment Admin"""
@@ -83,7 +86,6 @@ class CommitmentAdmin(admin.ModelAdmin):
     list_filter = ['status', 'created_at']
     search_fields = ['investor__full_name', 'investor__email', 'deal__company_name']
     readonly_fields = ['created_at', 'updated_at']
-
 
 @admin.register(Document)
 class DocumentAdmin(admin.ModelAdmin):
@@ -97,7 +99,6 @@ class DocumentAdmin(admin.ModelAdmin):
         if not change:  # Only set on creation
             obj.uploaded_by = request.user
         super().save_model(request, obj, form, change)
-
 
 @admin.register(SecureLink)
 class SecureLinkAdmin(admin.ModelAdmin):
@@ -120,3 +121,11 @@ class SecureLinkAdmin(admin.ModelAdmin):
         if not change:  # Only set on creation
             obj.created_by = request.user
         super().save_model(request, obj, form, change)
+
+@admin.register(MyModel)
+class MyModelAdmin(admin.ModelAdmin):
+    list_display = ("title", "content")
+    search_fields = ("title", "content")    
+    
+    def save_model(self, request, obj, form, change):
+        return super().save_model(request, obj, form, change)

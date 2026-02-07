@@ -1,0 +1,53 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}Bulk Upload Investors{% endblock %}
+
+{% block page_title %}Investors{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h4 class="mb-0"><i class="bi bi-upload"></i> Bulk Upload Investors</h4>
+                    
+                    <a href="{% url 'investors:download_demo_file' %}" class="btn btn-light btn-sm fw-bold">
+                        <i class="bi bi-download"></i> Download Template
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    
+                    <div class="alert alert-info">
+                        <strong>How it works:</strong>
+                        <ul class="mb-0 small">
+                            <li>Download the template using the button above.</li>
+                            <li>Fill in your investor data.</li>
+                            <li><strong>Demo Data:</strong> If you leave the example row (John Doe, PAN: ABCDE1234F) in the file, the system will automatically <strong>skip</strong> it.</li>
+                            <li>Existing investors (matched by PAN) will be updated; new ones created.</li>
+                        </ul>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data" class="mt-4">
+                        {% csrf_token %}
+                        <div class="mb-4">
+                            <label for="id_file" class="form-label fw-bold">Select Excel or CSV File</label>
+                            <input type="file" name="file" class="form-control form-control-lg" id="id_file" required accept=".csv, .xlsx, .xls">
+                        </div>
+
+                        <div class="d-flex justify-content-between pt-2 border-top">
+                            <a href="{% url 'investors:investor_list' %}" class="btn btn-outline-secondary">
+                                <i class="bi bi-arrow-left"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn-success px-4">
+                                <i class="bi bi-cloud-upload"></i> Upload & Process
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

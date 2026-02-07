@@ -18,15 +18,28 @@
         border-left: 4px solid transparent;
         transition: transform 0.2s;
     }
+
     .card-stat:hover {
         transform: translateY(-5px);
-        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
     }
-    .card-stat.primary { border-left-color: #0d6efd; }
-    .card-stat.success { border-left-color: #198754; }
-    .card-stat.warning { border-left-color: #ffc107; }
-    .card-stat.info { border-left-color: #0dcaf0; }
-    
+
+    .card-stat.primary {
+        border-left-color: #0d6efd;
+    }
+
+    .card-stat.success {
+        border-left-color: #198754;
+    }
+
+    .card-stat.warning {
+        border-left-color: #ffc107;
+    }
+
+    .card-stat.info {
+        border-left-color: #0dcaf0;
+    }
+
     .icon-box {
         width: 48px;
         height: 48px;
@@ -36,16 +49,32 @@
         justify-content: center;
         font-size: 1.5rem;
     }
-    .bg-soft-primary { background-color: rgba(13, 110, 253, 0.1); color: #0d6efd; }
-    .bg-soft-success { background-color: rgba(25, 135, 84, 0.1); color: #198754; }
-    .bg-soft-warning { background-color: rgba(255, 193, 7, 0.1); color: #ffc107; }
-    .bg-soft-info { background-color: rgba(13, 202, 240, 0.1); color: #0dcaf0; }
+
+    .bg-soft-primary {
+        background-color: rgba(13, 110, 253, 0.1);
+        color: #0d6efd;
+    }
+
+    .bg-soft-success {
+        background-color: rgba(25, 135, 84, 0.1);
+        color: #198754;
+    }
+
+    .bg-soft-warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: #ffc107;
+    }
+
+    .bg-soft-info {
+        background-color: rgba(13, 202, 240, 0.1);
+        color: #0dcaf0;
+    }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container-fluid px-0">
-    
+
     <div class="card mb-4 border-0 shadow-sm">
         <div class="card-body p-4">
             <div class="row align-items-center">
@@ -55,30 +84,26 @@
                         <span class="badge bg-light text-dark border me-2">Round {{ deal.round_no }}</span>
                         Target Deal Size: <strong>₹{{ deal.deal_size|floatformat:0 }}</strong>
                     </p>
-                    
+
                     {% widthratio total_committed_amount deal.deal_size 100 as progress_percent %}
                     <div class="d-flex justify-content-between mb-1">
                         <span class="small fw-bold">Fundraising Progress</span>
                         <span class="small fw-bold">{{ progress_percent }}%</span>
                     </div>
                     <div class="progress" style="height: 10px;">
-                        <div class="progress-bar bg-primary" role="progressbar" 
-                             style="width: {{ progress_percent }}%" 
-                             aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        <div class="progress-bar bg-primary" role="progressbar" style="width: {{ progress_percent }}%"
+                            aria-valuenow="{{ progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
                     <a href="{% url 'investors:deal_detail' deal.pk %}" class="btn btn-outline-primary">
                         <i class="bi bi-file-earmark-text"></i> View Deal Details
                     </a>
-                    <button class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addCommitmentModal">
-                        <i class="bi bi-plus-lg"></i> Add Commitment
-                    </button>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <div class="row g-4 mb-4">
         <div class="col-md-3">
             <div class="card border-0 shadow-sm card-stat primary h-100">
@@ -171,73 +196,101 @@
                     <h5 class="mb-0">Investor Commitments</h5>
                     <div class="input-group input-group-sm" style="width: 250px;">
                         <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
-                        <input type="text" id="tableSearch" class="form-control border-start-0" placeholder="Search investor...">
+                        <input type="text" id="tableSearch" class="form-control border-start-0"
+                            placeholder="Search investor...">
                     </div>
                 </div>
                 <div class="card-body p-0">
                     {% if commitments %}
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0" id="commitmentsTable">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th class="ps-4">Investor</th>
-                                        <th>Contact</th>
-                                        <th>Amount</th>
-                                        <th>Status</th>
-                                        <th>Date</th>
-                                        <th class="text-end pe-4">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for commitment in commitments %}
-                                    <tr>
-                                        <td class="ps-4">
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar-sm bg-light rounded-circle text-primary d-flex align-items-center justify-content-center me-2" style="width:35px; height:35px">
-                                                    {{ commitment.investor.full_name|first }}
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0">{{ commitment.investor.full_name }}</h6>
-                                                    <small class="text-muted">ID: #{{ commitment.pk }}</small>
-                                                </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0" id="commitmentsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-4">Investor</th>
+                                    <th>Contact</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                    <th class="text-end pe-4">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for commitment in commitments %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-sm bg-light rounded-circle text-primary d-flex align-items-center justify-content-center me-2"
+                                                style="width:35px; height:35px">
+                                                {{ commitment.investor.full_name|first }}
                                             </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <small><i class="bi bi-envelope me-1"></i> {{ commitment.investor.email }}</small>
-                                                <small class="text-muted"><i class="bi bi-phone me-1"></i> {{ commitment.investor.mobile }}</small>
+                                            <div>
+                                                <h6 class="mb-0">{{ commitment.investor.full_name }}</h6>
+                                                <small class="text-muted">ID: #{{ commitment.pk }}</small>
                                             </div>
-                                        </td>
-                                        <td><h6 class="mb-0">₹{{ commitment.amount|floatformat:0 }}</h6></td>
-                                        <td>
-                                            {% if commitment.status == 'paid' %}
-                                                <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle">Paid</span>
-                                            {% elif commitment.status == 'committed' %}
-                                                <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
-                                            {% else %}
-                                                <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle">{{ commitment.get_status_display }}</span>
-                                            {% endif %}
-                                        </td>
-                                        <td><small class="text-muted">{{ commitment.created_at|date:"M d, Y" }}</small></td>
-                                        <td class="text-end pe-4">
-                                            <div class="dropdown">
-                                                <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown">
-                                                    <i class="bi bi-three-dots-vertical"></i>
-                                                </button>
-                                                <ul class="dropdown-menu dropdown-menu-end">
-                                                    <li><a class="dropdown-item" href="{% url 'investors:investor_detail' commitment.investor.pk %}">View Profile</a></li>
-                                                    <li><a class="dropdown-item" href="{% url 'investors:commitment_update' commitment.pk %}">Edit Commitment</a></li>
-                                                </ul>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <small><i class="bi bi-envelope me-1"></i> {{ commitment.investor.email}}</small>
+                                            <small class="text-muted"><i class="bi bi-phone me-1"></i> {{ commitment.investor.mobile }}</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <h6 class="mb-0">₹{{ commitment.amount|floatformat:0 }}</h6>
+                                    </td>
+                                    <td>
+                                        {% if commitment.status == 'paid' %}
+                                            <span class="badge rounded-pill bg-success-subtle text-success border border-success-subtle">Paid</span>
+                                        {% elif commitment.status == 'committed' %}
+                                            <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle">Pending</span>
+                                        {% else %}
+                                            <span class="badge rounded-pill bg-info-subtle text-info border border-info-subtle">{{ commitment.get_status_display }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><small class="text-muted">{{ commitment.created_at|date:"M d, Y" }}</small></td>
+                                    <td class="text-end pe-4">
+                                        <div class="dropdown">
+                                            <button class="btn btn-sm btn-light border-0" type="button" data-bs-toggle="dropdown">
+                                                <i class="bi bi-three-dots-vertical"></i>
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <li><a class="dropdown-item" href="{% url 'investors:investor_detail' commitment.investor.pk %}">View Profile</a></li>
+                                                <li><a class="dropdown-item" href="{% url 'investors:commitment_update' commitment.pk %}">Edit Commitment</a></li>
+
+                                                {% if commitment.status == 'interested' or commitment.status == 'committed' %}
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item text-success" href="{% url 'investors:commitment_approve' commitment.pk %}">
+                                                        <i class="bi bi-check-circle me-2"></i> Approve & Request Payment
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+
+                                                {% if commitment.status == 'payment_uploaded' %}
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item text-primary"
+                                                        href="{% url 'investors:commitment_confirm' commitment.pk %}">
+                                                        <i class="bi bi-check-all me-2"></i> Verify & Close Deal
+                                                    </a>
+                                                </li>
+                                                {% endif %}
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
                     {% else %}
                         <div class="text-center py-5">
-                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" width="60" class="opacity-50 mb-3">
+                            <img src="https://cdn-icons-png.flaticon.com/512/7486/7486744.png" alt="Empty" width="60"
+                                class="opacity-50 mb-3">
                             <p class="text-muted">No commitments found for this deal.</p>
                         </div>
                     {% endif %}
@@ -258,29 +311,29 @@
             labels: ['Paid', 'Pending'],
             datasets: [{
                 data: [{{ total_paid_amount }}, {{ total_pending_amount }}],
-                backgroundColor: ['#198754', '#ffc107'],
-                hoverOffset: 4,
-                borderWidth: 0
-            }]
+        backgroundColor: ['#198754', '#ffc107'],
+        hoverOffset: 4,
+        borderWidth: 0
+    }]
         },
-        options: {
-            responsive: true,
+    options: {
+        responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom',
+                plugins: {
+            legend: {
+                position: 'bottom',
                     labels: { usePointStyle: true, boxWidth: 10 }
-                }
-            },
-            cutout: '70%'
-        }
+            }
+        },
+        cutout: '70%'
+    }
     });
 
     // 2. Simple Table Search Function
-    document.getElementById('tableSearch').addEventListener('keyup', function() {
+    document.getElementById('tableSearch').addEventListener('keyup', function () {
         let searchText = this.value.toLowerCase();
         let tableRows = document.querySelectorAll('#commitmentsTable tbody tr');
-        
+
         tableRows.forEach(row => {
             let text = row.innerText.toLowerCase();
             row.style.display = text.includes(searchText) ? '' : 'none';

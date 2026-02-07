@@ -1,0 +1,63 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}Upload Payment Proof - Investor Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="bi bi-upload"></i> Upload Payment Proof</h4>
+                </div>
+                <div class="card-body p-4">
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        Please upload the transaction receipt or screenshot for your commitment to <strong>{{ commitment.deal.company_name }}</strong>.
+                    </div>
+
+                    <div class="mb-4 p-3 bg-light rounded border">
+                        <h6 class="text-muted text-uppercase small fw-bold mb-3">Commitment Details</h6>
+                        <div class="row g-2">
+                            <div class="col-6">
+                                <small class="text-muted d-block">Deal Name</small>
+                                <strong>{{ commitment.deal.company_name }}</strong>
+                            </div>
+                            <div class="col-6">
+                                <small class="text-muted d-block">Round</small>
+                                Round {{ commitment.deal.round_no }}
+                            </div>
+                            <div class="col-12 mt-2">
+                                <small class="text-muted d-block">Committed Amount</small>
+                                <span class="fs-4 fw-bold text-muted">₹{{ commitment.amount|floatformat:2 }}</span>
+                            </div>
+                            <div class="col-12 mt-2">
+                                <small class="text-muted d-block">Approved Amount</small>
+                                <span class="fs-4 fw-bold text-success">₹{{ commitment.approved_amount|floatformat:2 }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label for="payment_proof" class="form-label fw-bold">Select Payment Receipt File</label>
+                            <input type="file" name="payment_proof" id="payment_proof" class="form-control" required accept=".pdf,.jpg,.jpeg,.png">
+                            <div class="form-text">Accepted formats: PDF, JPG, PNG. Max size: 5MB.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-cloud-arrow-up"></i> Upload & Confirm Payment
+                            </button>
+                            <a href="javascript:history.back()" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

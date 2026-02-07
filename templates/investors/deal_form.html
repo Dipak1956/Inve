@@ -6,94 +6,154 @@
 <div class="container-fluid">
     <div class="row justify-content-center">
         <div class="col-md-10">
-            <div class="card">
-                <div class="card-header">
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
                     <h4 class="mb-0"><i class="bi bi-briefcase"></i> {% if object %}Edit{% else %}Add New{% endif %} Deal</h4>
                 </div>
                 <div class="card-body">
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" id="dealUpdateForm">
                         {% csrf_token %}
-                        <div class="row g-3">
-                            <div class="col-md-12">
+                        
+                        <h5 class="text-primary mb-3">Basic Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-8">
                                 <label for="{{ form.company_name.id_for_label }}" class="form-label">{{ form.company_name.label }} <span class="text-danger">*</span></label>
                                 {{ form.company_name }}
-                                {% if form.company_name.errors %}
-                                    <div class="text-danger small">{{ form.company_name.errors }}</div>
-                                {% endif %}
+                                {% if form.company_name.errors %}<div class="text-danger small">{{ form.company_name.errors }}</div>{% endif %}
                             </div>
+                            <div class="col-md-4">
+                                <label for="{{ form.category.id_for_label }}" class="form-label">{{ form.category.label }}</label>
+                                {{ form.category }}
+                                {% if form.category.errors %}<div class="text-danger small">{{ form.category.errors }}</div>{% endif %}
+                            </div>
+
                             <div class="col-md-12">
-                                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }} <span class="text-danger">*</span></label>
+                                <label for="{{ form.description.id_for_label }}" class="form-label">{{ form.description.label }} <span class="text-danger">*</span> <small class="text-muted">(Public - Visible to Investors)</small></label>
                                 {{ form.description }}
-                                {% if form.description.errors %}
-                                    <div class="text-danger small">{{ form.description.errors }}</div>
-                                {% endif %}
+                                {% if form.description.errors %}<div class="text-danger small">{{ form.description.errors }}</div>{% endif %}
                             </div>
-                            <div class="col-md-4">
-                                <label for="{{ form.deal_size.id_for_label }}" class="form-label">{{ form.deal_size.label }} <span class="text-danger">*</span></label>
-                                {{ form.deal_size }}
-                                {% if form.deal_size.errors %}
-                                    <div class="text-danger small">{{ form.deal_size.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4">
-                                <label for="{{ form.ticket_size.id_for_label }}" class="form-label">{{ form.ticket_size.label }} <span class="text-danger">*</span></label>
-                                {{ form.ticket_size }}
-                                {% if form.ticket_size.errors %}
-                                    <div class="text-danger small">{{ form.ticket_size.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-4">
-                                <label for="{{ form.round_no.id_for_label }}" class="form-label">{{ form.round_no.label }} <span class="text-danger">*</span></label>
-                                {{ form.round_no }}
-                                {% if form.round_no.errors %}
-                                    <div class="text-danger small">{{ form.round_no.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} <span class="text-danger">*</span></label>
-                                {{ form.status }}
-                                {% if form.status.errors %}
-                                    <div class="text-danger small">{{ form.status.errors }}</div>
-                                {% endif %}
-                            </div>
-                            <div class="col-md-6">
-                                <label for="{{ form.workflow_status.id_for_label }}" class="form-label">{{ form.workflow_status.label }} <span class="text-danger">*</span></label>
-                                {{ form.workflow_status }}
-                                {% if form.workflow_status.errors %}
-                                    <div class="text-danger small">{{ form.workflow_status.errors }}</div>
-                                {% endif %}
+                            
+                            <div class="col-md-12">
+                                <label for="{{ form.video_url.id_for_label }}" class="form-label">{{ form.video_url.label }}</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-play-btn"></i></span>
+                                    {{ form.video_url }}
+                                </div>
+                                <div class="form-text">{{ form.video_url.help_text }}</div>
+                                {% if form.video_url.errors %}<div class="text-danger small">{{ form.video_url.errors }}</div>{% endif %}
                             </div>
                         </div>
+
+                        <hr>
+
+                        <h5 class="text-primary mb-3">Financial Details</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-3">
+                                <label for="{{ form.deal_size.id_for_label }}" class="form-label">{{ form.deal_size.label }} <span class="text-danger">*</span></label>
+                                {{ form.deal_size }}
+                                {% if form.deal_size.errors %}<div class="text-danger small">{{ form.deal_size.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.ticket_size.id_for_label }}" class="form-label">{{ form.ticket_size.label }} <span class="text-danger">*</span></label>
+                                {{ form.ticket_size }}
+                                {% if form.ticket_size.errors %}<div class="text-danger small">{{ form.ticket_size.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.min_commitment.id_for_label }}" class="form-label">{{ form.min_commitment.label }}</label>
+                                {{ form.min_commitment }}
+                                {% if form.min_commitment.errors %}<div class="text-danger small">{{ form.min_commitment.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.max_commitment.id_for_label }}" class="form-label">{{ form.max_commitment.label }}</label>
+                                {{ form.max_commitment }}
+                                {% if form.max_commitment.errors %}<div class="text-danger small">{{ form.max_commitment.errors }}</div>{% endif %}
+                            </div>
+
+                            <div class="col-md-3">
+                                <label for="{{ form.round_no.id_for_label }}" class="form-label">{{ form.round_no.label }}</label>
+                                {{ form.round_no }}
+                                {% if form.round_no.errors %}<div class="text-danger small">{{ form.round_no.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.expected_closing_date.id_for_label }}" class="form-label">{{ form.expected_closing_date.label }}</label>
+                                {{ form.expected_closing_date }}
+                                {% if form.expected_closing_date.errors %}<div class="text-danger small">{{ form.expected_closing_date.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }}</label>
+                                {{ form.status }}
+                                {% if form.status.errors %}<div class="text-danger small">{{ form.status.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-3">
+                                <label for="{{ form.workflow_status.id_for_label }}" class="form-label">{{ form.workflow_status.label }}</label>
+                                {{ form.workflow_status }}
+                                {% if form.workflow_status.errors %}<div class="text-danger small">{{ form.workflow_status.errors }}</div>{% endif %}
+                            </div>
+
+                            {% if user.is_partner or user.is_admin %}
+                            <div class="col-md-12">
+                                <label for="{{ form.assigned_team_members.id_for_label }}" class="form-label">{{ form.assigned_team_members.label }}</label>
+                                {{ form.assigned_team_members }}
+                                <div class="form-text">{{ form.assigned_team_members.help_text }}</div>
+                                {% if form.assigned_team_members.errors %}<div class="text-danger small">{{ form.assigned_team_members.errors }}</div>{% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
                         
-                        <!-- Document Uploads Section -->
-                        <hr class="my-4">
-                        <h5 class="mb-3"><i class="bi bi-file-earmark-arrow-up"></i> Document Uploads</h5>
+                        <hr>
+
+                        <h5 class="text-primary mb-3"><i class="bi bi-file-earmark-arrow-up"></i> Documents & Assets</h5>
+                        <div class="alert alert-info py-2 small">
+                            <i class="bi bi-info-circle"></i> Supported formats: PDF, PPTX, XLSX, DOCX.
+                        </div>
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label for="{{ form.pitch_deck.id_for_label }}" class="form-label">{{ form.pitch_deck.label }}</label>
                                 {{ form.pitch_deck }}
-                                <small class="form-text text-muted">{{ form.pitch_deck.help_text }}</small>
-                                {% if form.pitch_deck.errors %}
-                                    <div class="text-danger small">{{ form.pitch_deck.errors }}</div>
-                                {% endif %}
+                                <div class="form-text">{{ form.pitch_deck.help_text }}</div>
+                                {% if form.pitch_deck.errors %}<div class="text-danger small">{{ form.pitch_deck.errors }}</div>{% endif %}
                             </div>
                             <div class="col-md-6">
                                 <label for="{{ form.financials.id_for_label }}" class="form-label">{{ form.financials.label }}</label>
                                 {{ form.financials }}
-                                <small class="form-text text-muted">{{ form.financials.help_text }}</small>
-                                {% if form.financials.errors %}
-                                    <div class="text-danger small">{{ form.financials.errors }}</div>
-                                {% endif %}
+                                <div class="form-text">{{ form.financials.help_text }}</div>
+                                {% if form.financials.errors %}<div class="text-danger small">{{ form.financials.errors }}</div>{% endif %}
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label for="{{ form.one_pager.id_for_label }}" class="form-label">{{ form.one_pager.label }}</label>
+                                {{ form.one_pager }}
+                                <div class="form-text">{{ form.one_pager.help_text }}</div>
+                                {% if form.one_pager.errors %}<div class="text-danger small">{{ form.one_pager.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.write_up.id_for_label }}" class="form-label">{{ form.write_up.label }}</label>
+                                {{ form.write_up }}
+                                <div class="form-text">{{ form.write_up.help_text }}</div>
+                                {% if form.write_up.errors %}<div class="text-danger small">{{ form.write_up.errors }}</div>{% endif %}
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="{{ form.term_sheet.id_for_label }}" class="form-label">{{ form.term_sheet.label }}</label>
+                                {{ form.term_sheet }}
+                                <div class="form-text">{{ form.term_sheet.help_text }}</div>
+                                {% if form.term_sheet.errors %}<div class="text-danger small">{{ form.term_sheet.errors }}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.projections.id_for_label }}" class="form-label">{{ form.projections.label }}</label>
+                                {{ form.projections }}
+                                <div class="form-text">{{ form.projections.help_text }}</div>
+                                {% if form.projections.errors %}<div class="text-danger small">{{ form.projections.errors }}</div>{% endif %}
                             </div>
                         </div>
                         
-                        <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Save
-                            </button>
-                            <a href="{% url 'investors:deal_list' %}" class="btn btn-secondary">
+                        <div class="mt-5 d-flex justify-content-between">
+                            <a href="{% url 'investors:deal_list' %}" class="btn btn-outline-secondary">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="bi bi-check-circle"></i> Save Deal
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -102,12 +162,37 @@
     </div>
 </div>
 
+{% if object %}
+<!-- Update Note Modal -->
+<div class="modal fade" id="updateNoteModal" tabindex="-1" aria-labelledby="updateNoteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="updateNoteModalLabel"><i class="bi bi-pencil-square"></i> Describe Your Changes</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted small">Please provide a brief description of the changes you've made to this deal.</p>
+                <div class="mb-3">
+                    <label for="updateNoteTextarea" class="form-label fw-bold">Internal Note</label>
+                    <textarea class="form-control" id="updateNoteTextarea" rows="4" placeholder="e.g., Updated expected closing date and added new pitch deck..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmUpdateBtn">Save with Note</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <script>
-    // Add Bootstrap classes to form fields
+    // Ensure Bootstrap formatting is applied if widgets miss it
     document.addEventListener('DOMContentLoaded', function() {
         const inputs = document.querySelectorAll('input, select, textarea');
         inputs.forEach(input => {
-            if (!input.classList.contains('form-control') && !input.classList.contains('form-select')) {
+            if (input.type !== 'checkbox' && !input.classList.contains('form-control') && !input.classList.contains('form-select')) {
                 if (input.tagName === 'SELECT') {
                     input.classList.add('form-select');
                 } else if (input.tagName === 'TEXTAREA') {
@@ -117,7 +202,41 @@
                 }
             }
         });
+
+        {% if object %}
+        // Handle Update Modal
+        const dealForm = document.getElementById('dealUpdateForm');
+        const updateModal = new bootstrap.Modal(document.getElementById('updateNoteModal'));
+        const confirmBtn = document.getElementById('confirmUpdateBtn');
+        const noteTextarea = document.getElementById('updateNoteTextarea');
+        let noteAdded = false;
+
+        dealForm.onsubmit = function(e) {
+            if (!noteAdded) {
+                e.preventDefault();
+                updateModal.show();
+            }
+        };
+
+        confirmBtn.addEventListener('click', function() {
+            const noteValue = noteTextarea.value.trim();
+            if (noteValue === "") {
+                alert("Please provide a note describing your changes.");
+                return;
+            }
+
+            // Add hidden field for the note
+            const hiddenNote = document.createElement('input');
+            hiddenNote.type = 'hidden';
+            hiddenNote.name = 'update_note_text';
+            hiddenNote.value = noteValue;
+            dealForm.appendChild(hiddenNote);
+
+            noteAdded = true;
+            updateModal.hide();
+            dealForm.submit();
+        });
+        {% endif %}
     });
 </script>
 {% endblock %}
-

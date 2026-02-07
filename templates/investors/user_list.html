@@ -1,0 +1,227 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}User Management - Admin Panel{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-people-fill"></i> User Management</h1>
+        <a href="{% url 'investors:user_create' %}" class="btn btn-primary">
+            <i class="bi bi-person-plus-fill"></i> Add New User
+        </a>
+    </div>
+
+    <ul class="nav nav-tabs mb-4" id="userTabs" role="tablist">
+        {% if request.user.is_admin %}      
+        <li class="nav-item">
+            <button class="nav-link inner" data-bs-toggle="tab" data-bs-target="#partners" type="button">
+                Partners <span class="badge bg-primary ms-1">{{ partners.count }}</span>
+            </button>
+        </li>
+        <li class="nav-item inner active">
+           <button class="nav-link inner active" data-bs-toggle="tab" data-bs-target="#team" type="button">
+               Team Members <span class="badge bg-secondary ms-1">{{ team_members.count }}</span>
+           </button>
+        </li> 
+        {% else %}
+        <li class="nav-item inner active">
+           <button class="nav-link inner active" data-bs-toggle="tab" data-bs-target="#team" type="button">
+               Team Members <span class="badge bg-secondary ms-1">{{ team_members.count }}</span>
+           </button>
+        </li> 
+        {% endif %}        
+    </ul>
+
+    <div class="tab-content">
+       {% if request.user.is_admin %}
+        <div class="tab-pane fade" id="partners">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Partners</th>
+                                <th>Role</th>
+                                <th>Created By</th>
+                                <th>Status</th>
+                                <th>Date Joined</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in partners %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar bg-primary-subtle text-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            {{ user.first_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-primary">Partner</span></td>
+                                <td>
+                                    {% if user.created_by %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-check me-2 text-muted"></i>
+                                            <a href="{% url 'investors:user_detail' user.created_by.pk %}" class="text-decoration-none text-dark">
+                                                {{ user.created_by.get_full_name|default:user.created_by.username }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">System / Super Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'investors:user_detail' user.pk %}" class="btn btn-sm btn-light">View</a>
+                                    <a href="{% url 'investors:user_edit' user.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No partners found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade active show" id="team">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">Team Members</th>
+                                <th>Role</th>
+                                <th>Created By</th>
+                                <th>Status</th>
+                                <th>Date Joined</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in team_members %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            {{ user.first_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">Team Member</span></td>
+                                <td>
+                                    {% if user.created_by %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-check me-2 text-muted"></i>
+                                            <a href="{% url 'investors:user_detail' user.created_by.pk %}" class="text-decoration-none text-dark">
+                                                {{ user.created_by.get_full_name|default:user.created_by.username }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">System / Super Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'investors:user_detail' user.pk %}" class="btn btn-sm btn-light">View</a>
+                                    <a href="{% url 'investors:user_edit' user.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No team members found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% else %}       
+        <div class="tab-pane fade active show" id="team">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-0">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="ps-4">User</th>
+                                <th>Role</th>
+                                <th>Created By</th>
+                                <th>Status</th>
+                                <th>Date Joined</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in team_members %}
+                            <tr>
+                                <td class="ps-4">
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar bg-secondary-subtle text-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                            {{ user.first_name|first|upper }}
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold">{{ user.get_full_name|default:user.username }}</div>
+                                            <small class="text-muted">{{ user.email }}</small>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">Team Member</span></td>
+                                <td>
+                                    {% if user.created_by %}
+                                        <div class="d-flex align-items-center">
+                                            <i class="bi bi-person-check me-2 text-muted"></i>
+                                            <a href="{% url 'investors:user_detail' user.created_by.pk %}" class="text-decoration-none text-dark">
+                                                {{ user.created_by.get_full_name|default:user.created_by.username }}
+                                            </a>
+                                        </div>
+                                    {% else %}
+                                        <span class="badge bg-light text-dark border">System / Super Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    {% if user.is_active %}
+                                        <span class="badge bg-success-subtle text-success">Active</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger">Inactive</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.date_joined|date:"M d, Y" }}</td>
+                                <td class="text-end pe-4">
+                                    <a href="{% url 'investors:user_detail' user.pk %}" class="btn btn-sm btn-light">View</a>
+                                    <a href="{% url 'investors:user_edit' user.pk %}" class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr><td colspan="5" class="text-center py-4 text-muted">No team members found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

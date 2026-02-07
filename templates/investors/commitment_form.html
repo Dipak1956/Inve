@@ -29,12 +29,19 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-6">
-                                <label for="{{ form.amount.id_for_label }}" class="form-label">{{ form.amount.label }} <span class="text-danger">*</span></label>
+                                <label for="{{ form.amount.id_for_label }}" class="form-label">Committed {{ form.amount.label }} <span class="text-danger">*</span></label>
                                 {{ form.amount }}
                                 {% if form.amount.errors %}
                                     <div class="text-danger small">{{ form.amount.errors }}</div>
                                 {% endif %}
                             </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.approved_amount.id_for_label }}" class="form-label">{{ form.approved_amount.label }} <span class="text-danger">*</span></label>
+                                {{ form.approved_amount }}
+                                {% if form.approved_amount.errors %}
+                                    <div class="text-danger small">{{ form.approved_amount.errors }}</div>
+                                {% endif %}
+                            </div>                            
                             <div class="col-md-6">
                                 <label for="{{ form.status.id_for_label }}" class="form-label">{{ form.status.label }} <span class="text-danger">*</span></label>
                                 {{ form.status }}
@@ -43,7 +50,7 @@
                                 {% endif %}
                             </div>
                             <div class="col-md-12">
-                                <label for="{{ form.payment_proof.id_for_label }}" class="form-label">{{ form.payment_proof.label }}</label>
+                                <label for="{{ form.payment_proof.id_for_label }}" class="form-label">{{ form.payment_proof.label }} <span class="text-danger">*</span></label>
                                 {{ form.payment_proof }}
                                 {% if form.payment_proof.errors %}
                                     <div class="text-danger small">{{ form.payment_proof.errors }}</div>
@@ -56,9 +63,27 @@
                             </div>
                         </div>
                         <div class="mt-4">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-check-circle"></i> Save
+                            {% if object %}
+                                {% if user.is_partner or user.is_admin %}
+                                <button type="submit" name="action" value="confirm" class="btn btn-primary" {% if object.status == 'pending' or object.status == 'not_committed' or object.status == 'confirmed' or object.status == 'rejected' %}disabled{% endif %}>
+                                    <i class="bi bi-check-circle"></i> {{ form.submit_button }}
+                                </button>
+                                {% else %}
+                                <button type="submit" name="action" value="confirm" class="btn btn-primary" {% if object.status == 'pending' or object.status == 'not_committed' or object.status == 'committed' or object.status == 'confirmed' or object.status == 'rejected' %}disabled{% endif %}>
+                                    <i class="bi bi-check-circle"></i> {{ form.submit_button }}
+                                </button>
+                            {% endif %}                            
+                            {% if object.status == 'payment_uploaded' and user.is_partner %}
+                            <button type="submit" name="action" value="reject" class="btn btn-danger">
+                                <i class="bi bi-x-circle"></i> Reject
                             </button>
+                            {% endif %}
+                            {% else  %}
+                            <button type="submit" name="action" value="confirm" class="btn btn-primary">
+                                <i class="bi bi-check-circle"></i> {{ form.submit_button }}
+                            </button>                            
+                            {% endif %}
+
                             <a href="{% url 'investors:commitment_list' %}" class="btn btn-secondary">
                                 <i class="bi bi-x-circle"></i> Cancel
                             </a>

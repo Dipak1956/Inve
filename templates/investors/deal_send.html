@@ -1,0 +1,337 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}Send Invitation - {{ deal.company_name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-1"><i class="bi bi-send"></i> Send Deal Invitation</h1>
+            <p class="text-muted mb-0">Deal: <strong>{{ deal.company_name }}</strong></p>
+        </div>
+        <a href="{% url 'investors:deal_detail' deal.pk %}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Deal
+        </a>
+    </div>
+    <form method="post" id="sendInviteForm">
+        {% csrf_token %}
+        <div class="card shadow-sm border-0 mb-4" id="customizationCard" style="display: {% if preview_data %}block{% else %}none{% endif %};">
+            <div class="card-header bg-white py-3">
+                <h5 class="card-title mb-0"><i class="bi bi-envelope"></i> Email Customization</h5>
+            </div>            
+            <div class="card-body bg-light">
+                <div class="mb-0">
+                    <label class="form-label fw-bold small text-uppercase text-muted d-none">Invitation Template</label>                    
+                    {{ form.content }}
+                    <label class="d-none">{{ form.subject }}</label>
+                </div>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-white py-3 border-bottom-0">
+                        <h5 class="card-title mb-0"><i class="bi bi-gear"></i> Configuration</h5>
+                    </div>
+                    <div class="card-body bg-light rounded-bottom">
+                        {{ form.media }}
+                        {% if not user.smtp_password %}
+                        <div class="alert alert-danger small">
+                            <i class="bi bi-exclamation-triangle-fill"></i> Setup your
+                            <a href="{% url 'investors:user_edit' user.pk %}">App Password</a> first.
+                        </div>
+                        {% endif %}
+                        <div class="mb-3">
+                            <label for="{{ form.expiry_days.id_for_label }}"
+                                class="form-label fw-bold small text-uppercase text-muted">Link Expiry</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-white border-end-0"><i
+                                        class="bi bi-calendar-event"></i></span>
+                                {{ form.expiry_days }}
+                                <span class="input-group-text bg-white border-start-0">Days</span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="{{ form.existing_template.id_for_label }}"
+                                class="form-label fw-bold small text-uppercase text-muted">Load Template</label>
+                            {{ form.existing_template }}
+                            <div class="form-text small">Selection will refresh the editor.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm border-0">
+                    <div class="card-body p-4 text-center">
+                        <h2 class="display-6 fw-bold mb-1" id="selectedCount">0</h2>
+                        <p class="mb-4 opacity-75">Investors Selected</p>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" name="action" value="preview"
+                                class="btn btn-info text-white fw-bold shadow-sm" id="previewBtn" disabled>
+                                <i class="bi bi-eye-fill me-2"></i> Preview Email
+                            </button>
+
+                            <button type="submit" name="action" value="send" class="btn btn-success fw-bold shadow-sm"
+                                id="submitBtn" disabled {% if not user.smtp_password %}data-no-smtp="true"
+                                title="Setup App Password first" {% endif %}>
+                                <i class="bi bi-send-fill me-2"></i> Send Invitations
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-0 h-100">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="bi bi-people"></i> Select Recipients</h5>
+
+                        <div class="d-flex gap-2">
+                            <div class="input-group input-group-sm" style="width: 250px;">
+                                <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                                <input type="text" id="investorSearch" class="form-control border-start-0"
+                                    placeholder="Search name or email...">
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-primary" id="selectAllBtn">Select
+                                All</button>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-0">
+                        <div class="list-group list-group-flush" style="max-height: 500px; overflow-y: auto;">
+                            {% for checkbox in form.investors %}
+                            <label
+                                class="list-group-item list-group-item-action d-flex align-items-center p-3 investor-item">
+                                <div class="form-check flex-grow-1 mb-0">
+                                    {{ checkbox.tag }}
+                                    <div class="ms-2 d-inline-block align-middle">
+                                        <span class="fw-bold text-dark investor-name">{{ checkbox.choice_label }}</span>
+                                        {% if checkbox.data.value in already_invited_ids %}
+                                            <script>
+                                                // Add metadata to the checkbox for JS to pick up
+                                                document.addEventListener('DOMContentLoaded', function() {
+                                                    const cb = document.querySelector('input[name="investors"][value="{{ checkbox.data.value }}"]');
+                                                    if (cb) cb.setAttribute('data-already-invited', 'true');
+                                                });
+                                            </script>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </label>
+                            {% empty %}
+                            <div class="text-center py-5 text-muted">
+                                <i class="bi bi-person-x fs-1"></i>s
+                                <p>No active investors found.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light small text-muted">
+                        Only active investors are shown in this list.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Re-invite Confirmation Modal -->
+<div class="modal fade" id="confirmResendModal" tabindex="-1" aria-labelledby="confirmResendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmResendModalLabel">Confirm Re-invitation</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Some selected investors have already been invited to this deal. Do you wish to proceed and send invitations again?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No, Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmResendBtn">Yes, Proceed</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom Scrollbar for the list */
+    .list-group-flush::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .list-group-flush::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    .list-group-flush::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 3px;
+    }
+
+    .list-group-flush::-webkit-scrollbar-thumb:hover {
+        background: #aaa;
+    }
+
+    /* Better Checkbox Styling */
+    .form-check-input {
+        width: 1.3em;
+        height: 1.3em;
+        margin-top: 0.1em;
+        cursor: pointer;
+    }
+
+    .list-group-item {
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+    }
+
+    .list-group-item.selected {
+        background-color: #e7f1ff;
+        border-left: 3px solid #0d6efd;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const checkboxes = document.querySelectorAll('input[name="investors"]');
+        const selectAllBtn = document.getElementById('selectAllBtn');
+        const countDisplay = document.getElementById('selectedCount');
+        const searchInput = document.getElementById('investorSearch');
+        const submitBtn = document.getElementById('submitBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const listItems = document.querySelectorAll('.investor-item');
+      
+        // Update Count & UI
+        function updateState() {
+            const checkedCount = document.querySelectorAll('input[name="investors"]:checked').length;
+            countDisplay.textContent = checkedCount;
+
+            // Enable/Disable submit buttons
+            const hasSelection = checkedCount > 0;
+            const noSmtp = submitBtn.getAttribute('data-no-smtp') === 'true';
+
+            if (submitBtn) submitBtn.disabled = !hasSelection || noSmtp;
+            if (previewBtn) previewBtn.disabled = !hasSelection;
+
+            // Update visual state of list items
+            checkboxes.forEach(cb => {
+                const item = cb.closest('.list-group-item');
+                if (cb.checked) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+        }
+
+        // Handle Form Submission with Popup
+        const form = document.getElementById('sendInviteForm');
+        const confirmModal = new bootstrap.Modal(document.getElementById('confirmResendModal'));
+        const confirmYesBtn = document.getElementById('confirmResendBtn');
+        let forceSubmit = false;
+
+        form.addEventListener('submit', function(e) {
+            // Only intercept if the "Send" button was clicked
+            const action = document.activeElement ? document.activeElement.value : '';
+            if (action !== 'send' || forceSubmit) return;
+
+            const selectedCheckboxes = document.querySelectorAll('input[name="investors"]:checked');
+            let hasAlreadyInvited = false;
+            
+            selectedCheckboxes.forEach(cb => {
+                if (cb.getAttribute('data-already-invited') === 'true') {
+                    hasAlreadyInvited = true;
+                }
+            });
+
+            if (hasAlreadyInvited) {
+                e.preventDefault();
+                confirmModal.show();
+            }
+        });
+
+        confirmYesBtn.addEventListener('click', function() {
+            forceSubmit = true;
+            // Add force_send hidden field
+            const hiddenForce = document.createElement('input');
+            hiddenForce.type = 'hidden';
+            hiddenForce.name = 'force_send';
+            hiddenForce.value = 'true';
+            form.appendChild(hiddenForce);
+            
+            // Add action=send explicitly since we're calling form.submit()
+            const hiddenAction = document.createElement('input');
+            hiddenAction.type = 'hidden';
+            hiddenAction.name = 'action';
+            hiddenAction.value = 'send';
+            form.appendChild(hiddenAction);
+
+            form.submit();
+        });
+
+        // Handle Template Selection change (Auto-submit to load template)
+        const templateSelect = document.getElementById('id_existing_template');
+        if (templateSelect) {
+            templateSelect.addEventListener('change', function() {
+                if (this.value) {
+                    try {
+                        const form = document.getElementById('sendInviteForm');
+                        // Create a hidden input to signal template load
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = 'action';
+                        hidden.value = 'load_template';
+                        form.appendChild(hidden);
+                        form.submit();
+                    } catch (error) {
+                        console.error('Error submitting form:', error);
+                    }
+                }
+            });
+        }
+        // Handle Select All
+        let allSelected = false;
+        selectAllBtn.addEventListener('click', function () {
+            allSelected = !allSelected;
+
+            // Only select visible items (respect search filter)
+            listItems.forEach(item => {
+                if (item.style.display !== 'none') {
+                    const cb = item.querySelector('input[type="checkbox"]');
+                    cb.checked = allSelected;
+                }
+            });
+
+            this.textContent = allSelected ? 'Deselect All' : 'Select All';
+            updateState();
+        });
+
+        // Handle Individual Clicks
+        checkboxes.forEach(cb => {
+            cb.addEventListener('change', updateState);
+        });
+
+        // Handle Search
+        searchInput.addEventListener('keyup', function () {
+            const term = this.value.toLowerCase();
+
+            listItems.forEach(item => {
+                const text = item.innerText.toLowerCase();
+                if (text.includes(term)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+        // Initial check
+        updateState();
+    });
+</script>
+{% endblock %}

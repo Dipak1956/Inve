@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deal Interest - {{ deal.company_name }} - Beeline Capital Advisors</title>
+    <title>Deal Interest - {{ deal.company_name }} - Beeline InvestHub</title>
     
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -49,7 +49,7 @@
         <div class="card deal-card">
             <div class="deal-header text-center">
                 <i class="bi bi-briefcase fs-1 mb-3"></i>
-                <h2 class="mb-2">Beeline Capital Advisors</h2>
+                <h2 class="mb-2">Beeline InvestHub</h2>
                 <p class="mb-0">Investment Opportunity</p>
             </div>
             <div class="card-body p-4">
@@ -72,8 +72,7 @@
                             </div>
                             <div class="col-md-6">
                                 <p><strong>Ticket Size:</strong> ₹{{ deal.ticket_size|floatformat:2 }}</p>
-                                <p><strong>Status:</strong> <span class="badge bg-info">{{ deal.get_status_display }}</span></p>
-                                <p><strong>Workflow:</strong> <span class="badge bg-success">{{ deal.get_workflow_status_display }}</span></p>
+                                <p><strong>Status:</strong> <span class="badge bg-info">{{ deal.get_status_display }}</span></p>                                
                             </div>
                             <div class="col-12 mt-3">
                                 <p><strong>Description:</strong></p>
@@ -106,14 +105,16 @@
                 {% if existing_commitment %}
                 <div class="alert alert-warning" role="alert">
                     <i class="bi bi-info-circle"></i> 
-                    <strong>Current Status:</strong> You have already expressed interest in this deal.
-                    <br>
                     <strong>Status:</strong> <span class="badge bg-{% if existing_commitment.status == 'paid' %}success{% elif existing_commitment.status == 'committed' %}warning{% else %}info{% endif %}">
+                        {% if existing_commitment.status == 'pending' %}
+                        Response Awaited
+                        {% else %}
                         {{ existing_commitment.get_status_display }}
+                        {% endif %}
                     </span>
                     {% if existing_commitment.amount %}
                     <br>
-                    <strong>Committed Amount:</strong> ₹{{ existing_commitment.amount|floatformat:2 }}
+                    <strong>Committed Amount:</strong> ₹{{ existing_commitment.amount|floatformat }}
                     {% endif %}
                 </div>
                 {% endif %}
@@ -129,39 +130,27 @@
                             
                             <div class="mb-4">
                                 <label class="form-label fw-bold">Select Your Response:</label>
-                                <div class="row g-3">
+                                <div class="row g-3">                                    
                                     <div class="col-md-4">
-                                        <div class="card action-btn text-center p-3 cursor-pointer" onclick="selectAction('interested')">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="action" id="action_interested" value="interested" {% if form.action.value == 'interested' %}checked{% endif %}>
-                                                <label class="form-check-label w-100" for="action_interested">
-                                                    <i class="bi bi-hand-thumbs-up fs-1 d-block mb-2 text-primary"></i>
-                                                    <strong>Interested</strong>
-                                                    <br><small class="text-muted">I'm interested in this deal</small>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <div class="card action-btn text-center p-3 cursor-pointer" onclick="selectAction('commit')">
+                                        <div class="card action-btn text-center p-3 cursor-pointer" onclick="selectAction('commit', this)">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="action" id="action_commit" value="commit" {% if form.action.value == 'commit' %}checked{% endif %}>
                                                 <label class="form-check-label w-100" for="action_commit">
                                                     <i class="bi bi-check-circle fs-1 d-block mb-2 text-success"></i>
-                                                    <strong>Commit Amount</strong>
-                                                    <br><small class="text-muted">I want to commit</small>
+                                                    <strong>Interested</strong>
+                                                    <br><small class="text-muted">Click Here To Procceed With Investment</small>
                                                 </label>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
-                                        <div class="card action-btn text-center p-3 cursor-pointer" onclick="selectAction('not_interested')">
+                                        <div class="card action-btn text-center p-3 cursor-pointer" onclick="selectAction('not_interested', this)">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="action" id="action_not_interested" value="not_interested" {% if form.action.value == 'not_interested' %}checked{% endif %}>
                                                 <label class="form-check-label w-100" for="action_not_interested">
                                                     <i class="bi bi-x-circle fs-1 d-block mb-2 text-danger"></i>
-                                                    <strong>Not Interested</strong>
-                                                    <br><small class="text-muted">Not interested</small>
+                                                    <strong>Pass For Now</strong>
+                                                    <br><small class="text-muted">Thank you for this investment opportunity. I am not interested at this time, but I appreciate the offer.</small>
                                                 </label>
                                             </div>
                                         </div>
@@ -174,16 +163,28 @@
                             
                             <!-- Commitment Amount Field (shown only when Commit is selected) -->
                             <div class="mb-4" id="amountField" style="display: none;">
-                                <label for="{{ form.committed_amount.id_for_label }}" class="form-label fw-bold">
-                                    <i class="bi bi-currency-rupee"></i> Commitment Amount (INR)
-                                </label>
-                                {{ form.committed_amount }}
-                                <small class="form-text text-muted">Minimum ticket size: ₹{{ deal.ticket_size|floatformat:2 }}</small>
-                                {% if form.committed_amount.errors %}
-                                    <div class="text-danger small">{{ form.committed_amount.errors }}</div>
-                                {% endif %}
+                                <div class="mb-3">
+                                    <label for="{{ form.committed_amount.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-currency-rupee"></i> Commitment Amount (INR)
+                                    </label>
+                                    {{ form.committed_amount }}
+                                    <small class="form-text text-muted">Minimum ticket size: ₹{{ deal.ticket_size|floatformat }}</small>
+                                    {% if form.committed_amount.errors %}
+                                        <div class="text-danger small">{{ form.committed_amount.errors }}</div>
+                                    {% endif %}
+                                </div>
                             </div>
-                            
+                            <div class="mb-3" id="notInterestedRemarkField" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="{{ form.not_interested_remark.id_for_label }}" class="form-label fw-bold">
+                                        <i class="bi bi-info-circle"></i> Not Interested Remark
+                                    </label>
+                                    {{ form.not_interested_remark }}
+                                    {% if form.not_interested_remark.errors %}
+                                        <div class="text-danger small">{{ form.not_interested_remark.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-primary btn-lg">
                                     <i class="bi bi-check-circle"></i> Submit Response
@@ -199,36 +200,63 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function selectAction(action) {
+        function selectAction(action, element) {
+            // Update radio button
             document.getElementById('action_' + action).checked = true;
+            
+            // Update UI fields
             const amountField = document.getElementById('amountField');
+            const notInterestedRemarkField = document.getElementById('notInterestedRemarkField');
+            
+            const amountInput = document.getElementById('{{ form.committed_amount.id_for_label }}');
+            const remarkInput = document.getElementById('{{ form.not_interested_remark.id_for_label }}');
+
             if (action === 'commit') {
                 amountField.style.display = 'block';
-                document.getElementById('{{ form.committed_amount.id_for_label }}').required = true;
+                notInterestedRemarkField.style.display = 'none';
+                if (amountInput) amountInput.required = true;
+                if (remarkInput) remarkInput.required = false;
+            } else if (action === 'not_interested') {
+                amountField.style.display = 'none';
+                notInterestedRemarkField.style.display = 'block';
+                if (amountInput) amountInput.required = false;
+                if (remarkInput) remarkInput.required = false;
             } else {
                 amountField.style.display = 'none';
-                document.getElementById('{{ form.committed_amount.id_for_label }}').required = false;
+                notInterestedRemarkField.style.display = 'none';
+                if (amountInput) amountInput.required = false;
+                if (remarkInput) remarkInput.required = false;
             }
             
-            // Update active state
+            // Update active state on cards
             document.querySelectorAll('.action-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            event.currentTarget.classList.add('active');
+            
+            if (element) {
+                element.classList.add('active');
+            } else {
+                // Find card based on radio button if element not provided
+                const radio = document.getElementById('action_' + action);
+                if (radio) {
+                    const card = radio.closest('.action-btn');
+                    if (card) card.classList.add('active');
+                }
+            }
         }
         
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
             const selectedAction = document.querySelector('input[name="action"]:checked');
-            if (selectedAction && selectedAction.value === 'commit') {
-                document.getElementById('amountField').style.display = 'block';
+            if (selectedAction) {
+                selectAction(selectedAction.value);
             }
         });
         
         // Handle radio button clicks
         document.querySelectorAll('input[name="action"]').forEach(radio => {
             radio.addEventListener('change', function() {
-                selectAction(this.value);
+                selectAction(this.value, this.closest('.action-btn'));
             });
         });
     </script>

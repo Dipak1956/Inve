@@ -1,0 +1,39 @@
+{% extends 'investors/base.html' %}
+
+{% block title %}User Management - Admin Panel{% endblock %}
+
+{% block content %}
+
+<h1>Email Templates</h1>
+<div class="card p-3">
+    <div class="row d-flex">
+        <div class="col-md-3">
+            <form method="GET" id="template_form">
+                {{ form.existing_template }}
+            </form>
+        </div>
+        <div class="col-md-9"> {% if request.GET.existing_template %}
+        <button type="submit" name="delete" class="btn btn-danger">Delete</button>
+        {% endif %}
+    </div>
+    </div>
+    <div class="col-md-12">
+        <form method="POST" id="email_form">
+            {% csrf_token %}
+            <div class="col-md-12">
+                <input type="hidden" name="existing_template_hidden" value="{{ request.GET.existing_template }}">
+                <div class="mb-3">
+                    {% if form.existing_template.value == 'other' %}
+                    {{ form.title }}
+                    {% endif %}
+                </div>
+                {{ form.content }}
+                {{ form.media }} {# Essential for loading JS/CSS #}
+            </div>
+            <div class="col-md-12">
+                <button type="submit" class="btn btn-primary">Save</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
